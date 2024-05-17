@@ -1,22 +1,18 @@
-/**
- *
- * @param {Element} $container
- */
-
 // 한번만 실행하기 위해 index.js 상단에서 css 파일 추가
 const linkElement = document.createElement("link");
 linkElement.rel = "stylesheet";
 linkElement.href = "./star-rating/theme.css";
 document.head.appendChild(linkElement);
 
-// 커스텀 이벤트 또한 중복이기 때문에 한번만 생성
-const customEvent = new CustomEvent("rating-change", { bubbles: true, detail: "0" });
-
+/**
+ * @param {Element} $container
+ */
 const StarRating = ($container) => {
   const container = $container;
 
   /* attribute값만큼 Star 생성 */
-  const starCount = Number($container.getAttribute("data-max-rating"));
+  const starCount = JSON.parse($container.getAttribute("data-max-rating"));
+  // dataset으로 가져오는 방법 // const starCount = JSON.parse($container.dataset.maxRating);
   const starBox = `<i class='bx bxs-star'></i>`;
   let stars = "";
   for (let count = 0; count < starCount; count++) {
@@ -47,7 +43,7 @@ const StarRating = ($container) => {
     }
   };
   // 클릭 이벤트: 클릭된 별까지는 selected 클래스 추가 + hovered 클래스 제거
-  //           기존 높은 rating에서 낮은 rating 클릭 시 그 차이만큼 selected 클래스 제거
+  //             기존 높은 rating에서 낮은 rating 클릭 시 그 차이만큼 selected 클래스 제거
   const clickStarHandler = (e) => {
     if (e.target.tagName === "I") {
       const clickedtIndex = Array.from(starContainer.children).indexOf(e.target);
