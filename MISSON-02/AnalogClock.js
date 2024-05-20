@@ -2,8 +2,8 @@
  * @param {Element} $container
  */
 const AnalogClock = ($container) => {
-  /* 시계 요소 동적 생성 */
-  // 시계 요소 생성
+  /* 시계 바늘 요소 동적 생성 */
+  // 시계 바늘 요소 생성
   const hourHand = document.createElement("div");
   hourHand.classList.add("hand", "hour");
   const minuteHand = document.createElement("div");
@@ -33,7 +33,7 @@ const AnalogClock = ($container) => {
   /* const hourSetting = { interval: 60 * 60 * 1000, deg: 30 };
   const minuteSetting = { interval: 60 * 1000, deg: 6 };
   const secondSetting = { interval: 1000, deg: 6 }; */
-
+  console.log($container.querySelectorAll(".hand"));
   const handHour = $container.querySelector(".hand.hour");
   const handMinute = $container.querySelector(".hand.minute");
   const handSecond = $container.querySelector(".hand.second");
