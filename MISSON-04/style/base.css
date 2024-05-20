@@ -1,0 +1,41 @@
+:root {
+  font-size: 10px;
+  --header-color: #db5b33;
+  --calender-size: 300px;
+  --calender-green: #81d6a5;
+  --calender-red: red;
+  --calender-gray: #ccc;
+  --calender-black: black;
+}
+
+body {
+  width: 100dvw;
+  height: 100dvh;
+  overflow: scroll;
+}
+
+h1 {
+  font-size: 200%;
+  font-weight: 700;
+}
+
+.wrapper {
+  width: 200px;
+  margin: 0 auto;
+}
+
+header {
+  color: var(--header-color);
+  margin: 2rem 0;
+}
+
+button {
+  padding: 0;
+  background-color: inherit;
+}
+
+button:hover {
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+}
