@@ -1,27 +1,45 @@
-const state = {
-  category: "all",
+let state = null;
+let listeners = [];
+
+/**
+ * state = createState({category: "all"});
+ * state.category = "foo";
+ */
+
+// 상태와 상태 변화를 구독할 리스너들을 관리하는 객체
+const createState = (initialState) => {
+  state = new Proxy(initialState, {
+    set(target, key, newState) {
+      if (target[key] === newState) return false;
+
+      //console.log(listeners, key, newState);
+      console.log(`[state change] ${key} : ${target[key]} =>  ${newState}`);
+
+      target[key] = newState;
+      listeners.forEach((component) => {
+        component.render();
+      }); // re-rendering
+
+      return true;
+    },
+  });
 };
 
-function onChange(target, callback) {
-  const handler = {
-    set: function (obj, property, value) {
-      // 속성 값이 실제로 변경될 때만 콜백 함수 실행
-      if (obj[property] !== value) {
-        obj[property] = value;
-        callback(); // 값이 변할 때 실행할 함수
-      }
-      return true; // 성공적으로 값이 설정되었음을 나타냄
-    },
+const subscribe = (newListener) => {
+  if (!listeners.includes(newListener)) listeners = [...listeners, newListener];
+  console.log("----", listeners);
+
+  // unsubscribe
+  return () => {
+    listeners = listeners.filter((listener) => listener !== newListener);
   };
+};
 
-  return new Proxy(target, handler);
-}
+const store = {
+  state,
+  createState,
+  subscribe,
+};
 
-// 사용 예시
-export const person = onChange(state, function () {
-  console.log("값이 변경되었습니다.");
-});
-
-console.log(person);
-
-export default state;
+export default store;
+export { state, createState, subscribe };

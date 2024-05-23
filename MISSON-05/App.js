@@ -1,5 +1,5 @@
 import { Nav, NewsList } from "./components/index.js";
-//import { createState } from "./state/index.js";
+import { createState } from "./state/index.js";
 
 const App = ($container) => {
   $container.innerHTML = `
@@ -11,6 +11,9 @@ const App = ($container) => {
     </div>
   </div>
   `;
+
+  // 전역 상태 생성
+  createState({ category: "all" });
 
   new Nav($container.querySelector(".category-list"));
   new NewsList($container.querySelector(".news-list-container"));

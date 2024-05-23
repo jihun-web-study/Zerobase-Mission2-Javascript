@@ -1,37 +1,6 @@
 // do something!
-/* 
-<div class="news-list-container">
-        <article class="news-list">
-          <section class="news-item">
-            <div class="thumbnail">
-              <a href="https://www.ajunews.com/view/20220220180410403" target="_blank" rel="noopener noreferrer">
-                <img
-                  src="https://image.ajunews.com/content/image/2022/02/20/20220220180523846963.jpg"
-                  alt="thumbnail" />
-              </a>
-            </div>
-            <div class="contents">
-              <h2>
-                <a href="https://www.ajunews.com/view/20220220180410403" target="_blank" rel="noopener noreferrer">
-                  ​[뉴욕증시 주간전망] 러시아-우크라이나 긴장 속 변동성 지속 - 아주경제
-                </a>
-              </h2>
-              <p>
-                이번 주(21일~25일·현지시간) 뉴욕 증시는 러시아와 우크라이나 간 지정학적 긴장과 우크라이나 간 미국
-                연방준비제도(Fed·연준)의 긴축 우려에 계속해서...
-              </p>
-            </div>
-          </section>
-        </article>
-        <div class="scroll-observer">
-          <img src="img/ball-triangle.svg" alt="Loading..." />
-        </div>
-      </div>
-*/
-
-// do something!
-
-import state from "../state/index.js";
+import { state, subscribe } from "../state/index.js";
+import { API_KEY_1, API_KEY_2 } from "../util/apikey.js";
 
 class NewsList {
   /**
@@ -39,13 +8,124 @@ class NewsList {
    */
   constructor($container) {
     this.$container = $container;
+    this.$newsList = $container.querySelector(".news-list");
+    this.$scrollObserver = $container.querySelector(".scroll-observer");
 
-    this.render();
+    this.page = 1;
+
+    this.currentCategory = null;
+    this.totalNewsCount = 0;
+    this.currentNewsCount = 0;
+
+    this.intersectionObserver = this.createIntersectionObserver();
+
+    this.render().then(() => {
+      // scrollObserver 요소가 뷰포트와 교차하면 intersectionObserver의 observer가 호출됨
+      this.intersectionObserver.observe(this.$scrollObserver);
+      // 전역 상태를 구독하여 전역 상태 변경 시 컴포넌트의 render 메서드 호출 => re-rendering
+      subscribe(this);
+    });
+
+    subscribe(this);
   }
 
-  render() {
-    const liEls = state.category;
-    this.$container.innerHTML = `<div>${liEls}</div>`;
+  createIntersectionObserver() {
+    return new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting || target !== this.$scrollObserver) return;
+
+        // 더이상 불러들일 뉴스가 없는 경우
+        if (this.currentNewsCount !== 0 && this.totalNewsCount === this.currentNewsCount) {
+          console.log("no more news");
+
+          // 박스 영역 유지용
+          // => display: 'none';으로 하면 렌더링이 안되어 추후에 스크롤 옵저버가 감지 X
+          this.$scrollObserver.style.visibility = "hidden";
+          return;
+        }
+
+        this.$scrollObserver.style.visibility = "visible";
+        this.page += 1;
+        this.render();
+      });
+    });
+  }
+
+  // 2차 라이브 1:21:02
+  async render() {
+    // 카테고리 변화 감지 후 업데이트
+    const isCategoryChanged = this.currentCategory !== state.category;
+    // 카테고리가 바뀌면 page를 1로 초기화
+    if (isCategoryChanged) {
+      this.page = 1;
+      this.currentCategory = state.category;
+    }
+
+    // get News Articles
+    const { totalResults, articles } = await this.fetchArticles(state.category, this.page);
+    console.log(`[fetch-${this.currentCategory}-articles]`, { totalResults, articles });
+
+    this.totalNewsCount = totalResults;
+    const $articles = this.createArticleElements(articles);
+
+    if (isCategoryChanged) {
+      console.log(1, $articles);
+      this.$newsList.replaceChildren($articles);
+      this.currentNewsCount = articles.length;
+    } else {
+      console.log(2, $articles);
+      this.$newsList.appendChild($articles);
+      this.currentNewsCount += articles.length;
+    }
+
+    console.log("[render]", {
+      totalNewsCount: this.totalNewsCount,
+      currentNewsCount: this.currentNewsCount,
+    });
+  }
+
+  async fetchArticles(category, page) {
+    const pageSize = 5;
+    const apiKey = API_KEY_1; //
+    const url = `https://newsapi.org/v2/top-headlines?country=kr&category=${
+      category === "all" ? "" : category
+    }&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}`;
+
+    try {
+      // page를 1 증가시키면 다음 페이지의 뉴스를 취득한다.
+      const { data } = await axios.get(url);
+      return data;
+    } catch (error) {
+      console.log("error!: ", error);
+    }
+  }
+
+  // 뉴스 아이템 템플릿
+  createArticleElements(articles) {
+    const isURLToImageNull =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
+    const $template = document.createElement("template");
+
+    $template.innerHTML = articles
+      .map(
+        ({ title, description, url, urlToImage }) => `
+      <section class="news-item">
+        <div class="thumbnail">
+          <a href=${url} target="_blank" rel="noopener noreferrer">
+            <img src=${urlToImage || isURLToImageNull} alt="thumbnail" />
+          </a>
+        </div>
+        <div class="contents">
+          <h2>
+            <a href=${url} target="_blank" rel="noopener noreferrer">${title}</a>
+          </h2>
+          <p>${description || ""}</p>
+        </div>
+        </section>`
+      )
+      .join("");
+
+    return $template.content;
   }
 }
 

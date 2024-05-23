@@ -1,6 +1,6 @@
 // do something!
+import { state } from "../state/index.js";
 
-import state from "../state/index.js";
 class Nav {
   /**
    * @param {Element} $container
@@ -9,13 +9,13 @@ class Nav {
     this.$container = $container;
 
     this.categories = [
-      { id: "all", text: "전체보기" },
-      { id: "business", text: "비즈니스" },
-      { id: "entertainment", text: "엔터테인먼트" },
-      { id: "health", text: "건강" },
-      { id: "science", text: "과학" },
-      { id: "sports", text: "스포츠" },
-      { id: "technology", text: "기술" },
+      { name: "all", text: "전체보기" },
+      { name: "business", text: "비즈니스" },
+      { name: "entertainment", text: "엔터테인먼트" },
+      { name: "health", text: "건강" },
+      { name: "science", text: "과학" },
+      { name: "sports", text: "스포츠" },
+      { name: "technology", text: "기술" },
     ];
 
     this.render();
@@ -25,10 +25,10 @@ class Nav {
   render() {
     const liEls = this.categories
       .map(
-        ({ id, text }) =>
+        ({ name, text }) =>
           // 임시로 idx로 active 클래스 추가 => 추후에 전역 변수로 active 클래스 추가
-          `<li id="${id}" class="category-item ${
-            state.category === id ? "active" : ""
+          `<li id="${name}" class="category-item ${
+            state.category === name ? "active" : ""
           }">${text}</li>`
       )
       .join("");
