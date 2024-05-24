@@ -4,12 +4,12 @@ const print = console.log;
 
 let date = new Date();
 
-export const renderCalendar = () => {
+export const renderCalendar = ($container) => {
   const viewYear = date.getFullYear();
   const viewMonth = date.getMonth();
 
   // 현재 연도와 월 표시
-  const [headerMonth, headerYear] = document.querySelector(".nav-yearMonth").children;
+  const [headerMonth, headerYear] = $container.querySelector(".nav-yearMonth").children;
   headerYear.textContent = viewYear;
   headerMonth.textContent = monthMap[viewMonth];
 
@@ -53,12 +53,12 @@ export const renderCalendar = () => {
     ] = `<button class=${date.class} data-year=${date.year} data-month=${date.month}>${date.date}</button>`;
   });
 
-  document.querySelector(".calendar-days").innerHTML = dates.join("");
+  $container.querySelector(".calendar-days").innerHTML = dates.join("");
 
   // 오늘 날짜 표시해주기
   const today = new Date();
   if (viewMonth === today.getMonth() && viewYear === today.getFullYear()) {
-    for (const date of document.querySelectorAll(".thisMonth")) {
+    for (const date of $container.querySelectorAll(".thisMonth")) {
       // innerText는 string, getDate()는 number라 형변환
       if (Number(date.innerText) === today.getDate()) {
         date.classList.add("today");
@@ -68,11 +68,11 @@ export const renderCalendar = () => {
   }
 
   // 기존에 선택된 날짜 표시 //
-  const selectedDate = document.querySelector("#datePicker-input").value;
+  const selectedDate = $container.querySelector(".datePicker-input").value;
   if (selectedDate) {
     const [selectedYear, selectedMonth, selectedDay] = selectedDate.split("-").map(Number);
 
-    const dayButtons = document.querySelector(".calendar-days").children;
+    const dayButtons = $container.querySelector(".calendar-days").children;
     for (const dayButton of dayButtons) {
       const isSameYear = +dayButton.dataset.year === selectedYear;
       const isSameMonth = +dayButton.dataset.month === selectedMonth;
@@ -86,13 +86,14 @@ export const renderCalendar = () => {
   }
 };
 
-export const addEvents = () => {
+////
+export const addEvents = ($container) => {
   // 캘린더 이벤트 등록
   //캘린더 날짜에 이벤트 위임 방식으로 클릭 이벤트 등록 //
-  const daysCompo = document.querySelector(".calendar-days");
+  const daysCompo = $container.querySelector(".calendar-days");
   daysCompo.addEventListener("click", (event) => {
     const target = event.target;
-    const dateInput = document.getElementById("datePicker-input");
+    const dateInput = $container.querySelector(".datePicker-input");
 
     if (target.tagName === "BUTTON") {
       const dataset = target.dataset;
@@ -109,12 +110,13 @@ export const addEvents = () => {
     }
   });
   // 클릭 되면 포커스 아웃되도록 설정
-  document.querySelector(".calendar").addEventListener("mousedown", (event) => {
+  $container.querySelector(".calendar").addEventListener("mousedown", (event) => {
     event.preventDefault();
   });
 
   // input창 포커스/포커스아웃 시 캘린더 표시/숨김 처리 //
-  const dateInput = document.getElementById("datePicker-input");
+  const dateInput = $container.querySelector(".datePicker-input");
+
   // input 태그에 값이 있으면 날짜를 읽어와서 해당 날짜로 캘린더 렌더링
   dateInput.addEventListener("focus", (event) => {
     const value = event.target.value;
@@ -126,28 +128,28 @@ export const addEvents = () => {
         Number(selectDate[2])
       );
       date = selectedDate;
-      renderCalendar();
+      renderCalendar($container);
     }
 
-    document.querySelector(".calendar").style.display = "block";
+    $container.querySelector(".calendar").style.display = "block";
   });
   dateInput.addEventListener("focusout", (event) => {
-    const isCalendarOpen = document.querySelector(".calendar").contains(event.relatedTarget);
+    const isCalendarOpen = $container.querySelector(".calendar").contains(event.relatedTarget);
 
-    if (!isCalendarOpen) document.querySelector(".calendar").style.display = "none";
+    if (!isCalendarOpen) $container.querySelector(".calendar").style.display = "none";
   });
 
   // 캘린더 헤더에 이벤트 등록 //
-  const calendarNav = document.querySelector(".calendar-nav");
+  const calendarNav = $container.querySelector(".calendar-nav");
   calendarNav.addEventListener("click", (event) => {
     const prevMonth = () => {
       date.setMonth(date.getMonth() - 1);
-      renderCalendar();
+      renderCalendar($container);
     };
 
     const nextMonth = () => {
       date.setMonth(date.getMonth() + 1);
-      renderCalendar();
+      renderCalendar($container);
     };
 
     const classNames = event.target.className;

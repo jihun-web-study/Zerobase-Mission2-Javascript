@@ -1,15 +1,12 @@
 // do something!
 import { renderCalendar, addEvents } from "./calendar/calendar.js";
 
-function setCalendarSize(size) {
-  const calendar = document.querySelector(".calendar");
-  return calendar.style.setProperty("--calender-size", `${size}px`);
-}
-
 // HTML문서 로드가 완료되면 Date Picker 렌더링
-const main = () => {
-  const datePicker = document.querySelector("#datePicker");
-  const datePickerInner = `<input type="text" id="datePicker-input" placeholder="Select date" readonly />
+const datePickerInner = `
+  <header>
+        <h1>Calendar Datepicker</h1>
+      </header>
+  <input type="text" class="datePicker-input" placeholder="Select date" readonly />
 <div class="calendar">
   <nav class="calendar-nav">
     <button class="nav-btn btn-prev"></button>
@@ -33,11 +30,20 @@ const main = () => {
   </div>
 </div>`;
 
-  datePicker.innerHTML = datePickerInner;
+function setCalendarSize($container, size) {
+  const calendar = $container.querySelector(".calendar");
+  return calendar.style.setProperty("--calender-size", `${size}px`);
+}
 
-  renderCalendar();
-  addEvents();
-  setCalendarSize(200);
+const main = () => {
+  const $containers = [...document.querySelectorAll(".datePicker")];
+
+  $containers.forEach(($container, i) => {
+    $container.innerHTML = datePickerInner;
+    renderCalendar($container);
+    addEvents($container);
+    setCalendarSize($container, (i + 1) * 2 * 100);
+  });
 };
 
 document.addEventListener("DOMContentLoaded", main);
