@@ -1,8 +1,8 @@
-#datePicker {
+.datePicker {
   position: relative;
 }
 
-#datePicker-input {
+.datePicker-input {
   padding: 8px;
   font-size: 12px;
   font-weight: 700;
@@ -10,26 +10,13 @@
   box-shadow: 1px 1px 3px #666;
 }
 
-#datePicker-input::placeholder {
+.datePicker-input::placeholder {
   font-weight: 500;
 }
 
-#datePicker-input:focus,
-#datePicker-input:active {
+.datePicker-input:focus,
+.datePicker-input:active {
   outline: 1px solid blue;
-}
-
-.calendar-wrapper {
-  border: 3px solid orange;
-  margin: 10px;
-  padding: 20px;
-  width: 300px;
-  overflow: auto;
-  font-size: 100%;
-}
-
-.resizer {
-  resize: both;
 }
 
 .calendar {
@@ -44,11 +31,14 @@
   display: none;
   position: absolute;
   top: 100%;
+  left: 0;
   margin-top: 4px;
+  z-index: 99;
+  font-size: calc(var(--calender-size) / 20);
 }
 
-#datePicker-input:focus + .calendar,
-#datePicker-input:active + .calendar {
+.datePicker-input:focus + .calendar,
+.datePicker-input:active + .calendar {
   display: block;
 }
 
@@ -60,7 +50,6 @@
   align-items: center;
   padding: 0 2.4em;
   background-color: var(--calender-green);
-  font-size: 10px;
   color: white;
 }
 
@@ -68,7 +57,7 @@
   width: 0px;
   height: 0px;
   font-size: 1em;
-  border-right: 1rem solid white;
+  border-right: 1em solid white;
   border-top: 0.5em solid transparent;
   border-bottom: 0.5em solid transparent;
 }
@@ -126,6 +115,7 @@
   width: 100%;
   height: 100%;
   color: var(--calender-black);
+  font-size: 1.2em;
 }
 
 .calendar-days > button:nth-child(7n + 1):not(.prevMonth):not(.nextMonth) {
