@@ -1,6 +1,5 @@
 // do something!
 import { state, subscribe } from "../state/index.js";
-import { API_KEY_1, API_KEY_2 } from "../util/apikey.js";
 
 class NewsList {
   /**
@@ -12,6 +11,7 @@ class NewsList {
     this.$scrollObserver = $container.querySelector(".scroll-observer");
 
     this.page = 1;
+    this.apiKey = prompt("News API Key를 입력해주세요.");
 
     this.currentCategory = null;
     this.totalNewsCount = 0;
@@ -86,17 +86,18 @@ class NewsList {
 
   async fetchArticles(category, page) {
     const pageSize = 5;
-    const apiKey = API_KEY_1; //
+    // 개인 API Key 입력 // 보안을 위해
+    //const apiKey = prompt("News API Key를 입력해주세요.");
     const url = `https://newsapi.org/v2/top-headlines?country=kr&category=${
       category === "all" ? "" : category
-    }&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}`;
+    }&page=${page}&pageSize=${pageSize}&apiKey=${this.apiKey}`;
 
     try {
       // page를 1 증가시키면 다음 페이지의 뉴스를 취득한다.
       const { data } = await axios.get(url);
       return data;
     } catch (error) {
-      console.log("error!: ", error);
+      alert(`에러발생!\n${error.response.data.message}`);
     }
   }
 
